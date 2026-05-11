@@ -1,0 +1,55 @@
+flagchecker
+===========
+
+This program ("flagchecker") is distributed under the Mozilla Public License,
+version 2.0. See the LICENSE file for the full text.
+
+Copyright (C) KN White Hats
+Contact: compliance@wh.edu.pl
+
+Third-party components
+----------------------
+
+This program is dynamically linked against the GNU Multiple Precision
+Arithmetic Library (GMP).
+
+  GMP - The GNU Multiple Precision Arithmetic Library
+  Copyright (C) Free Software Foundation, Inc.
+  Homepage: https://gmplib.org/
+  Version linked against: 6.3.0
+
+GMP is licensed under the GNU Lesser General Public License, version 3 or
+later (LGPLv3+). The full text of the LGPLv3 is provided in
+licenses/LGPL-3.0.txt, and the full text of the GPLv3 (which the LGPLv3
+references) is provided in licenses/GPL-3.0.txt.
+
+Source code for GMP
+-------------------
+
+The complete corresponding source code for GMP can be obtained from the
+official GMP website:
+
+    https://gmplib.org/download/gmp/
+
+The exact version this binary was linked against (GMP 6.3.0) is available at:
+
+    https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz
+
+This written offer is valid for at least three (3) years from the date of
+distribution of this binary. To request the source on physical media, contact
+the distributor of this program.
+
+Relinking (LGPLv3 §4(d))
+------------------------
+
+The flagchecker binary is dynamically linked against libgmp.so.10. Users
+may replace the system's GMP shared library with a modified version
+compatible with the same ABI in order to produce a modified combined work,
+in accordance with LGPLv3 §4(d)(1).
+
+License compatibility
+---------------------
+
+The MPL-2.0 (covering flagchecker's own source) and LGPLv3 (covering GMP)
+are compatible for distribution as a combined work in executable form.
+See MPL-2.0 §3.3.
