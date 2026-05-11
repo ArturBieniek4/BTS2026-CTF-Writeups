@@ -45,6 +45,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install solution dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qemu-system-arm
+
+          qemu-system-aarch64 --version
+
       - name: Run solution and check flag
         shell: bash
         env:
