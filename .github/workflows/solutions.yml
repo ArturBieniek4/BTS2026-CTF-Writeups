@@ -1,0 +1,67 @@
+name: Solutions
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  discover:
+    name: Discover solutions
+    runs-on: ubuntu-latest
+    outputs:
+      solution_paths: ${{ steps.discover.outputs.solution_paths }}
+      has_solutions: ${{ steps.discover.outputs.has_solutions }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find solution run scripts
+        id: discover
+        shell: bash
+        run: |
+          mapfile -d '' paths < <(find . -path '*/solution/run.sh' -type f -print0 | sort -z)
+
+          if [ "${#paths[@]}" -eq 0 ]; then
+            echo 'solution_paths=[]' >> "$GITHUB_OUTPUT"
+            echo 'has_solutions=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          json=$(printf '%s\0' "${paths[@]}" | jq -Rsc 'split("\u0000")[:-1]')
+          echo "solution_paths=$json" >> "$GITHUB_OUTPUT"
+          echo 'has_solutions=true' >> "$GITHUB_OUTPUT"
+
+  run:
+    name: Run ${{ matrix.solution_path }}
+    needs: discover
+    if: needs.discover.outputs.has_solutions == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        solution_path: ${{ fromJson(needs.discover.outputs.solution_paths) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run solution and check flag
+        shell: bash
+        env:
+          SOLUTION_PATH: ${{ matrix.solution_path }}
+        run: |
+          set -o pipefail
+
+          solution_dir=$(dirname "$SOLUTION_PATH")
+          output_file="$RUNNER_TEMP/solution-output.txt"
+
+          chmod +x "$SOLUTION_PATH"
+          (
+            cd "$solution_dir"
+            ./run.sh
+          ) 2>&1 | tee "$output_file"
+
+          if ! grep -Eiq 'BtSCTF\{[^}]+\}' "$output_file"; then
+            echo "::error::No BtSCTF{...} flag found in solution output"
+            exit 1
+          fi
