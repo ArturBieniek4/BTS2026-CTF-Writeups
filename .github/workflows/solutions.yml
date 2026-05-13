@@ -62,7 +62,19 @@ jobs:
           set -o pipefail
 
           solution_dir=$(dirname "$SOLUTION_PATH")
+          flag_file="$solution_dir/flag.txt"
           output_file="$RUNNER_TEMP/solution-output.txt"
+
+          if [ ! -f "$flag_file" ]; then
+            echo "::error::Missing expected flag file: $flag_file"
+            exit 1
+          fi
+
+          expected_flag=$(grep -Eio 'BtSCTF\{[^}]+\}' "$flag_file" | head -n 1)
+          if [ -z "$expected_flag" ]; then
+            echo "::error::No BtSCTF{...} flag found in $flag_file"
+            exit 1
+          fi
 
           chmod +x "$SOLUTION_PATH"
           (
@@ -72,5 +84,10 @@ jobs:
 
           if ! grep -Eiq 'BtSCTF\{[^}]+\}' "$output_file"; then
             echo "::error::No BtSCTF{...} flag found in solution output"
+            exit 1
+          fi
+
+          if ! grep -Fq "$expected_flag" "$output_file"; then
+            echo "::error::Solution output does not contain expected flag from $flag_file"
             exit 1
           fi
