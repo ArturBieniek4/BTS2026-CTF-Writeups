@@ -45,15 +45,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install solution dependencies
-        shell: bash
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            qemu-system-arm
-
-          qemu-system-aarch64 --version
-
       - name: Run solution and check flag
         shell: bash
         env:
@@ -77,6 +68,14 @@ jobs:
           fi
 
           chmod +x "$SOLUTION_PATH"
+          if [ -f "$solution_dir/setup.sh" ]; then
+            chmod +x "$solution_dir/setup.sh"
+            (
+              cd "$solution_dir"
+              ./setup.sh
+            )
+          fi
+
           (
             cd "$solution_dir"
             ./run.sh
